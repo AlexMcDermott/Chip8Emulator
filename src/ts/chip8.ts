@@ -157,7 +157,7 @@ export default class Chip8 {
             this.v[x] -= this.v[y];
             break;
           case 0x6:
-            this.v[0xf] = (this.v[x] & 0x1) != 0x0 ? 1 : 0;
+            this.v[0xf] = (this.v[x] & 0x1) > 0x0 ? 1 : 0;
             this.v[x] >>= 1;
             break;
           case 0x7:
@@ -165,7 +165,7 @@ export default class Chip8 {
             this.v[x] = this.v[y] - this.v[x];
             break;
           case 0xe:
-            this.v[0xf] = (this.v[x] & 0x80) != 0x0 ? 1 : 0;
+            this.v[0xf] = (this.v[x] & 0x80) > 0x0 ? 1 : 0;
             this.v[x] <<= 1;
             break;
         }
@@ -188,7 +188,8 @@ export default class Chip8 {
           for (let col = 0; col < 8; col++) {
             const px = this.v[x] + col;
             const py = this.v[y] + row;
-            if ((line & 0x80) != 0) this.v[0xf] = this.display.set(px, py);
+            const value = (line & 0x80) > 0 ? 1 : 0;
+            this.v[0xf] = this.display.set(px, py, value);
             line <<= 1;
           }
         }
@@ -230,15 +231,15 @@ export default class Chip8 {
           case 0x33:
             this.memory[this.i] = Math.floor(this.v[x] / 100);
             this.memory[this.i + 1] = Math.floor((this.v[x] % 100) / 10);
-            this.memory[this.i + 2] = Math.floor(this.v[x] % 10);
+            this.memory[this.i + 2] = this.v[x] % 10;
             break;
           case 0x55:
-            for (let i = 0; i < this.v[x]; i++) {
+            for (let i = 0; i <= x; i++) {
               this.memory[this.i + i] = this.v[i];
             }
             break;
           case 0x65:
-            for (let i = 0; i < this.v[x]; i++) {
+            for (let i = 0; i <= x; i++) {
               this.v[i] = this.memory[this.i + i];
             }
             break;

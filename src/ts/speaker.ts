@@ -1,17 +1,18 @@
 export default class Speaker {
+  private ctx: AudioContext;
   private osc: OscillatorNode;
   private playing: boolean;
 
   constructor() {
-    const ctx = new AudioContext();
+    this.ctx = new AudioContext();
     const options = { type: 'square' as OscillatorType, frequency: 174.6 };
-    this.osc = new OscillatorNode(ctx, options);
-    this.osc.connect(ctx.destination);
+    this.osc = new OscillatorNode(this.ctx, options);
+    this.osc.connect(this.ctx.destination);
     this.playing = false;
   }
 
   public start() {
-    this.osc.start();
+    if (!this.playing) this.osc.start();
     this.playing = true;
   }
 

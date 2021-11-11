@@ -20,15 +20,17 @@ export default class Display {
     this.ctx = canvas.getContext('2d');
   }
 
-  public set(x: number, y: number) {
+  public set(x: number, y: number, value: number) {
     if (x > this.cols) x -= this.cols;
     if (x < 0) x += this.cols;
     if (y > this.rows) y -= this.rows;
     if (y < 0) y += this.rows;
 
     const index = y * this.cols + x;
-    this.display[index] ^= 1;
-    return this.display[index];
+    const prev = this.display[index];
+    const curr = this.display[index] ^ value;
+    this.display[index] = curr;
+    return prev == 1 && curr == 0 ? 1 : 0;
   }
 
   public clear() {
