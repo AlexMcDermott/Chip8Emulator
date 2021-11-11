@@ -1,0 +1,14 @@
+html,
+body {
+  margin: 0;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgb(161, 160, 161);
+}
+
+input {
+  display: none;
+}
