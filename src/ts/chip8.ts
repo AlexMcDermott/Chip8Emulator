@@ -1,6 +1,7 @@
 import Display from './display';
 import Keyboard from './keyboard';
 import Speaker from './speaker';
+import Stats from 'stats.js';
 
 export default class Chip8 {
   private memory: Uint8Array;
@@ -14,11 +15,13 @@ export default class Chip8 {
   private display: Display;
   private keyboard: Keyboard;
   private speaker: Speaker;
+  private stats: Stats;
 
   constructor(display: Display, keyboard: Keyboard, speaker: Speaker) {
     this.display = display;
     this.keyboard = keyboard;
     this.speaker = speaker;
+    this.initStats();
   }
 
   private init() {
@@ -41,11 +44,18 @@ export default class Chip8 {
     const program = new Uint8Array(rom);
     this.loadSprites();
     this.loadProgram(program);
-    this.step();
+    requestAnimationFrame(this.step.bind(this));
   }
 
-  public step() {
+  private initStats() {
+    this.stats = new Stats();
+    document.body.appendChild(this.stats.dom);
+  }
+
+  private step() {
+    this.stats.begin();
     this.cycle();
+    this.stats.end();
     requestAnimationFrame(this.step.bind(this));
   }
 

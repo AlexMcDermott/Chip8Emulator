@@ -1,8 +1,9 @@
 export default class Display {
   private cols: number;
   private rows: number;
+  private width: number;
+  private height: number;
   private display: Array<number>;
-  private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private scl: number;
 
@@ -14,10 +15,12 @@ export default class Display {
     const min = Math.min(width / this.cols, height / this.rows);
     this.scl = Math.floor(0.95 * min);
     this.display = new Array(this.cols * this.rows).fill(0);
-    this.canvas = canvas;
-    this.canvas.width = this.cols * this.scl;
-    this.canvas.height = this.rows * this.scl;
+    this.width = this.cols * this.scl;
+    this.height = this.rows * this.scl;
+    canvas.width = this.width;
+    canvas.height = this.height;
     this.ctx = canvas.getContext('2d');
+    this.render();
   }
 
   public set(x: number, y: number, value: number) {
@@ -39,7 +42,7 @@ export default class Display {
 
   public render() {
     this.ctx.fillStyle = '#000';
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.fillRect(0, 0, this.width, this.height);
     this.ctx.fillStyle = '#FFF';
 
     for (let i = 0; i < this.cols * this.rows; i++) {

@@ -11,5 +11,5 @@ const keyboard = new Keyboard();
 const speaker = new Speaker();
 const chip8 = new Chip8(display, keyboard, speaker);
 
-document.addEventListener('click', () => input.click());
+canvas.addEventListener('click', () => input.click());
 input.addEventListener('change', () => chip8.start(input.files[0]));

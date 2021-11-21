@@ -5,14 +5,18 @@
     "start": "parcel --open",
     "build": "rimraf dist && parcel build"
   },
+  "dependencies": {
+    "stats.js": "^0.17.0"
+  },
   "devDependencies": {
+    "@types/stats.js": "^0.17.0",
     "@typescript-eslint/eslint-plugin": "^5.3.0",
     "@typescript-eslint/parser": "^5.3.0",
     "eslint": "^8.2.0",
     "eslint-config-prettier": "^8.3.0",
     "husky": "^7.0.4",
     "lint-staged": "^11.2.6",
-    "parcel": "^2.0.0",
+    "parcel": "^2.0.1",
     "prettier": "2.4.1",
     "rimraf": "^3.0.2",
     "typescript": "^4.4.4"
