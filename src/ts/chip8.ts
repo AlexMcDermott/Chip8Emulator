@@ -15,13 +15,15 @@ export default class Chip8 {
   private display: Display;
   private keyboard: Keyboard;
   private speaker: Speaker;
+  private _cyclesPerStep: number;
   private stats: Stats;
 
   constructor(display: Display, keyboard: Keyboard, speaker: Speaker) {
     this.display = display;
     this.keyboard = keyboard;
     this.speaker = speaker;
-    this.initStats();
+    this.stats = new Stats();
+    document.body.appendChild(this.stats.dom);
   }
 
   private init() {
@@ -36,6 +38,15 @@ export default class Chip8 {
     this.display.clear();
     this.keyboard.clear();
     this.speaker.stop();
+    this.cyclesPerStep = 1;
+  }
+
+  public get cyclesPerStep(): number {
+    return this._cyclesPerStep;
+  }
+
+  public set cyclesPerStep(n: number) {
+    this._cyclesPerStep = n < 0 || !Number.isFinite(n) ? 1 : Math.floor(n);
   }
 
   public async start(file: File) {
@@ -47,11 +58,6 @@ export default class Chip8 {
     requestAnimationFrame(this.step.bind(this));
   }
 
-  private initStats() {
-    this.stats = new Stats();
-    document.body.appendChild(this.stats.dom);
-  }
-
   private step() {
     this.stats.begin();
     this.cycle();
@@ -60,11 +66,13 @@ export default class Chip8 {
   }
 
   private cycle() {
-    if (this.paused) return;
-    const instruction = (this.memory[this.pc] << 8) | this.memory[this.pc + 1];
-    this.pc += 2;
-    this.process(instruction);
-    this.updateTimers();
+    for (let i = 0; i < this._cyclesPerStep; i++) {
+      if (this.paused) return;
+      const opcode = (this.memory[this.pc] << 8) | this.memory[this.pc + 1];
+      this.pc += 2;
+      this.process(opcode);
+      this.updateTimers();
+    }
     this.sound();
     this.display.render();
   }
@@ -100,16 +108,16 @@ export default class Chip8 {
     }
   }
 
-  private process(instruction: number) {
-    const nnn = instruction & 0x0fff;
-    const n = instruction & 0x000f;
-    const x = (instruction & 0x0f00) >> 8;
-    const y = (instruction & 0x00f0) >> 4;
-    const kk = instruction & 0x00ff;
+  private process(opcode: number) {
+    const nnn = opcode & 0x0fff;
+    const n = opcode & 0x000f;
+    const x = (opcode & 0x0f00) >> 8;
+    const y = (opcode & 0x00f0) >> 4;
+    const kk = opcode & 0x00ff;
 
-    switch (instruction & 0xf000) {
+    switch (opcode & 0xf000) {
       case 0x0000:
-        switch (instruction & 0xff) {
+        switch (opcode & 0xff) {
           case 0xe0:
             this.display.clear();
             break;
@@ -141,7 +149,7 @@ export default class Chip8 {
         this.v[x] += kk;
         break;
       case 0x8000:
-        switch (instruction & 0xf) {
+        switch (opcode & 0xf) {
           case 0x0:
             this.v[x] = this.v[y];
             break;
@@ -202,7 +210,7 @@ export default class Chip8 {
         }
         break;
       case 0xe000:
-        switch (instruction & 0xff) {
+        switch (opcode & 0xff) {
           case 0x9e:
             if (this.keyboard.isPressed(this.v[x])) this.pc += 2;
             break;
@@ -212,7 +220,7 @@ export default class Chip8 {
         }
         break;
       case 0xf000:
-        switch (instruction & 0xff) {
+        switch (opcode & 0xff) {
           case 0x07:
             this.v[x] = this.dt;
             break;
@@ -253,7 +261,7 @@ export default class Chip8 {
         }
         break;
       default:
-        throw new Error('Unknown instruction');
+        throw new Error('Unknown opcode');
     }
   }
 }

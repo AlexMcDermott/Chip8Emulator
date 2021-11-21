@@ -1,23 +1,27 @@
 export default class Speaker {
   private ctx: AudioContext;
   private osc: OscillatorNode;
-  private playing: boolean;
+  private options: OscillatorOptions;
 
   constructor() {
     this.ctx = new AudioContext();
-    const options = { type: 'square' as OscillatorType, frequency: 174.6 };
-    this.osc = new OscillatorNode(this.ctx, options);
-    this.osc.connect(this.ctx.destination);
-    this.playing = false;
+    this.osc = null;
+    this.options = { type: 'square' as OscillatorType, frequency: 147 };
+    window.addEventListener('click', () => this.ctx.resume());
   }
 
   public start() {
-    if (!this.playing) this.osc.start();
-    this.playing = true;
+    if (this.osc != null) return;
+    this.osc = new OscillatorNode(this.ctx, this.options);
+    this.osc.connect(this.ctx.destination);
+    console.log('starting');
+    this.osc.start(this.ctx.currentTime);
   }
 
   public stop() {
-    if (this.playing) this.osc.stop();
-    this.playing = false;
+    if (this.osc == null) return;
+    this.osc.stop();
+    console.log('stopping');
+    this.osc = null;
   }
 }
